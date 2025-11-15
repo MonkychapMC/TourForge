@@ -1,11 +1,8 @@
-
-
-
 import React, { useState } from 'react';
 import { TourPackage, TourRoute, UserSettings } from '../types';
 import { View } from '../App';
 import { formatCurrency } from '../utils/currency';
-import { PlusIcon, EditIcon, TrashIcon, ShareIcon, CompassIcon } from './icons';
+import { PlusIcon, EditIcon, TrashIcon, ShareIcon, TourForgeLogo } from './icons';
 import { useI18n } from '../hooks/useI18n';
 
 interface DashboardProps {
@@ -88,7 +85,7 @@ const Dashboard: React.FC<DashboardProps> = ({ tourData, setView, initialTab = '
     return (
       <div className="flex items-center justify-center" style={{minHeight: 'calc(100vh - 200px)'}}>
         <div className="text-center p-8 sm:p-12 bg-[var(--color-card)] rounded-lg shadow-xl border border-[var(--color-border)] max-w-2xl mx-auto">
-          <CompassIcon className="w-16 h-16 text-[var(--color-primary)] mx-auto mb-4 animate-pulse" />
+          <TourForgeLogo className="w-24 h-24 mx-auto mb-4" />
           <h2 className="text-3xl font-bold font-serif text-[var(--color-text-primary)] mb-4">{t('welcomeTitle')}</h2>
           <p className="text-[var(--color-text-secondary)] mb-8 leading-relaxed">{t('welcomeMessage')}</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
