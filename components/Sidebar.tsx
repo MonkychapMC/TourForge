@@ -1,10 +1,7 @@
-
-
-
 import React from 'react';
 import { View } from '../App';
 import { useI18n } from '../hooks/useI18n';
-import { SettingsIcon, DashboardIcon, CompassIcon, PackageIcon, RouteIcon, CloseIcon } from './icons';
+import { SettingsIcon, DashboardIcon, TourForgeLogo, PackageIcon, RouteIcon, CloseIcon, InstallIcon } from './icons';
 
 interface SidebarProps {
   view: View;
@@ -12,6 +9,8 @@ interface SidebarProps {
   onSettingsClick: () => void;
   isOpen: boolean;
   onClose: () => void;
+  installPrompt: any | null;
+  onInstallClick: () => void;
 }
 
 const NavLink: React.FC<{
@@ -34,7 +33,7 @@ const NavLink: React.FC<{
 );
 
 
-const Sidebar: React.FC<SidebarProps> = ({ view, setView, onSettingsClick, isOpen, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ view, setView, onSettingsClick, isOpen, onClose, installPrompt, onInstallClick }) => {
     const { t, settings } = useI18n();
 
     const isHomeActive = view.type === 'DASHBOARD';
@@ -62,9 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ view, setView, onSettingsClick, isOpe
                         className="flex items-center gap-2"
                         aria-label="Go to dashboard"
                     >
-                        <CompassIcon 
-                            className="w-8 h-8 text-[var(--color-primary)]"
-                        />
+                        <TourForgeLogo className="w-8 h-8" />
                         <h1 className="text-xl font-bold font-serif">TourForge</h1>
                     </button>
                     {/* Mobile close button */}
@@ -93,6 +90,15 @@ const Sidebar: React.FC<SidebarProps> = ({ view, setView, onSettingsClick, isOpe
                     />
                 </nav>
                 <div className="p-4 border-t border-slate-700">
+                    {installPrompt && (
+                         <button
+                            onClick={onInstallClick}
+                            className="w-full mb-4 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white"
+                        >
+                            <InstallIcon className="w-5 h-5" />
+                            <span>{t('installApp')}</span>
+                        </button>
+                    )}
                     <p className="text-xs text-slate-400 mb-2">{t('userId')}:</p>
                     <p className="text-xs font-mono text-slate-300 break-all">{settings.userId}</p>
                     <button

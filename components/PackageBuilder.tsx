@@ -4,6 +4,7 @@ import { generateDescription, generatePromotionalImage, editImageWithPrompt } fr
 import { LoadingSpinner } from './icons';
 import { useI18n } from '../hooks/useI18n';
 import { generateShortId } from '../utils/shortId';
+import Tooltip from './Tooltip';
 
 interface PackageBuilderProps {
   existingPackage?: TourPackage;
@@ -114,20 +115,28 @@ const PackageBuilder: React.FC<PackageBuilderProps> = ({ existingPackage, allRou
         <div className={cardStyles + " space-y-6"}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label className={labelStyles}>{t('packageName')}</label>
+                    <Tooltip text={t('tooltipPackageName')}>
+                      <label className={labelStyles}>{t('packageName')}</label>
+                    </Tooltip>
                     <input type="text" name="name" value={pkg.name} onChange={handleChange} className={inputStyles} required />
                 </div>
                 <div>
-                    <label className={labelStyles}>{t('personCount')}</label>
+                    <Tooltip text={t('tooltipPersonCount')}>
+                      <label className={labelStyles}>{t('personCount')}</label>
+                    </Tooltip>
                     <input type="number" name="personCount" value={pkg.personCount} onChange={handleChange} min="1" className={inputStyles} />
                 </div>
                 <div className="col-span-1 md:col-span-2">
-                    <label className={labelStyles}>{t('description')}</label>
+                    <Tooltip text={t('tooltipDescription')}>
+                      <label className={labelStyles}>{t('description')}</label>
+                    </Tooltip>
                     <div className="flex gap-2">
                         <textarea name="description" value={pkg.description} onChange={handleChange} rows={3} className={inputStyles}></textarea>
-                        <button type="button" onClick={handleGenerateDescription} disabled={isGenerating.description || !pkg.name} className={aiButtonStyles} aria-label={t('generateDescription')}>
-                            {isGenerating.description ? <LoadingSpinner /> : 'AI'}
-                        </button>
+                        <Tooltip text={t('tooltipGenerateDescription')}>
+                          <button type="button" onClick={handleGenerateDescription} disabled={isGenerating.description || !pkg.name} className={aiButtonStyles} aria-label={t('generateDescription')}>
+                              {isGenerating.description ? <LoadingSpinner /> : 'AI'}
+                          </button>
+                        </Tooltip>
                     </div>
                 </div>
             </div>
@@ -139,17 +148,23 @@ const PackageBuilder: React.FC<PackageBuilderProps> = ({ existingPackage, allRou
             <div className="mt-2 p-4 border-2 border-dashed border-[var(--color-border)] rounded-lg">
                 {pkg.imageUrl && <img src={pkg.imageUrl} alt="Package" className="w-full h-auto max-h-60 object-contain rounded-md mb-4" />}
                 <div className="flex flex-col sm:flex-row gap-4">
+                  <Tooltip text={t('tooltipGenerateImage')} className="w-full">
                     <button type="button" onClick={handleGenerateImage} disabled={isGenerating.image} className="w-full flex items-center justify-center gap-2 bg-[var(--color-accent)] text-white px-4 py-2 rounded-md hover:bg-[var(--color-accent-hover)] disabled:opacity-70 transition-colors">
                         {isGenerating.image ? <LoadingSpinner /> : t('generateWithAi')}
                     </button>
+                  </Tooltip>
+                  <Tooltip text={t('tooltipUploadImage')} className="w-full">
                     <div className="relative w-full">
                         <input type="file" accept="image/*" onChange={handleImageFileChange} id="imageUpload" className="absolute w-0 h-0 opacity-0" />
                         <label htmlFor="imageUpload" className="cursor-pointer text-center w-full block bg-stone-500 text-white px-4 py-2 rounded-md hover:bg-stone-600 transition-colors">{t('uploadImage')}</label>
                     </div>
+                  </Tooltip>
                 </div>
                  {imageFile && (
                     <div className="mt-4 flex flex-col sm:flex-row gap-2">
-                        <input type="text" placeholder={t('editImagePlaceholder')} value={imageEditPrompt} onChange={(e) => setImageEditPrompt(e.target.value)} className={inputStyles + " flex-grow"} />
+                        <Tooltip text={t('tooltipEditImage')} className="w-full flex-grow">
+                          <input type="text" placeholder={t('editImagePlaceholder')} value={imageEditPrompt} onChange={(e) => setImageEditPrompt(e.target.value)} className={inputStyles + " flex-grow"} />
+                        </Tooltip>
                         <button type="button" onClick={handleEditImage} disabled={isGenerating.imageEdit || !imageEditPrompt} className="flex items-center justify-center gap-2 bg-[var(--color-primary)] text-white px-4 py-2 rounded-md hover:bg-[var(--color-primary-hover)] disabled:opacity-70 transition-colors">
                            {isGenerating.imageEdit ? <LoadingSpinner /> : t('editWithAi')}
                         </button>
@@ -160,18 +175,26 @@ const PackageBuilder: React.FC<PackageBuilderProps> = ({ existingPackage, allRou
 
         {/* Costs */}
         <div className={cardStyles}>
-          <h3 className="text-lg font-medium text-[var(--color-text-primary)] font-serif">{t('costsPerPerson')} (USD)</h3>
+          <Tooltip text={t('tooltipCostsPerPerson')}>
+            <h3 className="text-lg font-medium text-[var(--color-text-primary)] font-serif">{t('costsPerPerson')} (USD)</h3>
+          </Tooltip>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
             <div>
-                <label className={labelStyles}>{t('transport')}</label>
+                <Tooltip text={t('tooltipCostTransport')}>
+                  <label className={labelStyles}>{t('transport')}</label>
+                </Tooltip>
                 <input type="number" name="transport" value={pkg.costs.transport} className={inputStyles} onChange={handleChange} />
             </div>
             <div>
-                <label className={labelStyles}>{t('lodging')}</label>
+                <Tooltip text={t('tooltipCostLodging')}>
+                  <label className={labelStyles}>{t('lodging')}</label>
+                </Tooltip>
                 <input type="number" name="lodging" value={pkg.costs.lodging} onChange={handleChange} className={inputStyles} />
             </div>
             <div>
-                <label className={labelStyles}>{t('services')}</label>
+                <Tooltip text={t('tooltipCostServices')}>
+                  <label className={labelStyles}>{t('services')}</label>
+                </Tooltip>
                 <input type="number" name="services" value={pkg.costs.services} onChange={handleChange} className={inputStyles} />
             </div>
           </div>
@@ -179,7 +202,9 @@ const PackageBuilder: React.FC<PackageBuilderProps> = ({ existingPackage, allRou
 
         {/* Routes */}
         <div className={cardStyles}>
-            <h3 className="text-lg font-medium text-[var(--color-text-primary)] font-serif">{t('addRoutes')}</h3>
+            <Tooltip text={t('tooltipAddRoutes')}>
+              <h3 className="text-lg font-medium text-[var(--color-text-primary)] font-serif">{t('addRoutes')}</h3>
+            </Tooltip>
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {allRoutes.length > 0 ? allRoutes.map(route => (
                     <div key={route.id} className="flex items-center">

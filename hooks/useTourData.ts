@@ -29,6 +29,7 @@ const getInitialState = (): TourData => {
     const item = window.localStorage.getItem(LOCAL_STORAGE_KEY);
     if (item) {
       const parsed = JSON.parse(item);
+      // Ensure settings are merged with defaults to avoid missing keys on updates
       return {
           ...parsed,
           settings: {
@@ -41,9 +42,38 @@ const getInitialState = (): TourData => {
     console.error('Error reading from localStorage', error);
   }
 
+  // If no data in localStorage, create initial example data
+  const exampleRouteId = `route-${generateShortId()}`;
+  const exampleRoute: TourRoute = {
+    id: exampleRouteId,
+    name: "Historic Center Walking Tour",
+    description: "A 3-hour guided walk through the most iconic landmarks of the city center.",
+    stops: [
+      { id: generateShortId(), name: "Main Square", description: "The heart of the city's history." },
+      { id: generateShortId(), name: "National Cathedral", description: "A masterpiece of colonial architecture." },
+      { id: generateShortId(), name: "Founder's Museum", description: "Learn about the origins of the city." }
+    ],
+    kilometers: 5,
+    durationHours: 3,
+    personCount: 15,
+    quantities: { guide: 1, medical: 15, transport: 0, logistics: 15 },
+    photographerCost: 150,
+    isPhotographerOptional: true
+  };
+
+  const examplePackage: TourPackage = {
+    id: `pkg-${generateShortId()}`,
+    name: "Capital City Discovery",
+    description: "Experience the best of the capital with our comprehensive package, including a historic tour and all necessary services.",
+    imageUrl: `https://images.unsplash.com/photo-1549877452-9c3e87a42e47?q=80&w=2070&auto=format&fit=crop`,
+    personCount: 15,
+    costs: { transport: 80, lodging: 200, services: 50 },
+    routeIds: [exampleRouteId]
+  };
+
   return {
-    packages: [],
-    routes: [],
+    packages: [examplePackage],
+    routes: [exampleRoute],
     settings: defaultSettings,
   };
 };
@@ -51,6 +81,7 @@ const getInitialState = (): TourData => {
 export const useTourData = () => {
   const [data, setData] = useState<TourData>(getInitialState);
 
+  // FIX: Corrected a syntax error in the try-catch block. The catch statement was missing curly braces and there was an extra closing brace, which broke the function's scope.
   useEffect(() => {
     try {
       window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));

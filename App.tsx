@@ -1,5 +1,3 @@
-
-
 // Correctly import useState, useMemo, and useEffect from React.
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTour } from './hooks/TourDataProvider';
@@ -27,9 +25,23 @@ const App: React.FC = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAiAssistantOpen, setIsAiAssistantOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [installPrompt, setInstallPrompt] = useState<any | null>(null);
   const { t } = useI18n();
 
   const { packages, routes, settings, addPackage, updatePackage, addRoute, updateRoute, setSettings } = tourData;
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -65,14 +77,27 @@ const App: React.FC = () => {
     }
   };
 
+  const handleInstallClick = async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === 'accepted') {
+      console.log('User accepted the install prompt');
+    } else {
+      console.log('User dismissed the install prompt');
+    }
+    setInstallPrompt(null);
+  };
+
 
   const renderContent = () => {
     switch (view.type) {
       case 'DASHBOARD':
         return <Dashboard tourData={tourData} setView={setView} isHomePage={true} />;
       case 'PACKAGES_LIST':
+        return <Dashboard tourData={tourData} setView={setView} displayOnly="packages" />;
       case 'ROUTES_LIST':
-        return <Dashboard tourData={tourData} setView={setView} initialTab={view.type === 'ROUTES_LIST' ? 'routes' : 'packages'} />;
+        return <Dashboard tourData={tourData} setView={setView} displayOnly="routes" />;
       case 'CREATE_PACKAGE':
         return <PackageBuilder allRoutes={routes} onSave={addPackage} onCancel={() => setView({ type: 'PACKAGES_LIST' })} settings={settings} />;
       case 'EDIT_PACKAGE':
@@ -94,6 +119,8 @@ const App: React.FC = () => {
         onSettingsClick={() => setIsSettingsOpen(true)}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
+        installPrompt={installPrompt}
+        onInstallClick={handleInstallClick}
       />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header title={getTitleForView(view)} onMenuClick={() => setIsSidebarOpen(true)} />

@@ -48,17 +48,77 @@ export const CloseIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     </svg>
 );
 
-export const CompassIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <circle cx="12" cy="12" r="10"></circle>
-      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
-    </svg>
-);
-
 export const DashboardIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="7" height="9" x="3" y="3" rx="1" /><rect width="7" height="5" x="14" y="3" rx="1" /><rect width="7" height="9" x="14" y="12" rx="1" /><rect width="7" height="5" x="3" y="16" rx="1" /></svg>
 );
 
-export const TourForgeLogo: React.FC<{className?: string}> = ({className}) => (
-  <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH6AYbBCgqPSTt/wAAEWpJREFUeNrtnXmQXEV55z/n3N7T0z3T6XT2djebBLbDZAYDDAa7bAg2lWWjAIsYl4tUaZJISlSSRJWqXEW5j6pyL6pyL+V+iSRJqaTKIlGURZZRzGZsmGxDYAPYYJPsZnub7el0enr23HP+4/v1NFPdPb3d0z09/X3V88w5c+bcM5/5/T6/5z137pyZ0+A0OA1Og9NgxDX41+L/uL8Lh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4--- START OF FILE utils/translations.ts ---" />
+export const InstallIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+);
+
+
+export const TourForgeLogo: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" {...props} aria-label="TourForge Logo">
+    <defs>
+      <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" style={{ stopColor: '#26c6da', stopOpacity: 1 }} />
+        <stop offset="100%" style={{ stopColor: '#00BCD4', stopOpacity: 1 }} />
+      </linearGradient>
+      <linearGradient id="mountainGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" style={{ stopColor: '#48bb78', stopOpacity: 1 }} />
+        <stop offset="100%" style={{ stopColor: '#38a169', stopOpacity: 1 }} />
+      </linearGradient>
+       <linearGradient id="accentGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" style={{ stopColor: '#ff8a65', stopOpacity: 1 }} />
+        <stop offset="100%" style={{ stopColor: '#FF7043', stopOpacity: 1 }} />
+      </linearGradient>
+      <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="1.5"/>
+        <feOffset dx="1" dy="1" result="offsetblur"/>
+        <feComponentTransfer>
+          <feFuncA type="linear" slope="0.5"/>
+        </feComponentTransfer>
+        <feMerge>
+          <feMergeNode/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+    
+    <g filter="url(#dropShadow)">
+      {/* Main shape - rotated square */}
+      <path d="M50 0 L100 50 L50 100 L0 50 Z" fill="#334155"/>
+      
+      {/* Sky area */}
+      <path d="M50 5 L95 50 L50 95 L5 50 Z" fill="url(#skyGradient)" />
+      
+      {/* Mountains */}
+      <path d="M5 50 L30 35 L50 50 L30 65 Z" fill="#38a169" />
+      <path d="M95 50 L70 35 L50 50 L70 65 Z" fill="#38a169" />
+      <path d="M25 50 L50 30 L75 50 L50 70 Z" fill="url(#mountainGradient)" />
+
+      {/* Compass */}
+      <g transform="translate(50, 50)">
+        <circle r="18" fill="#1e293b" opacity="0.8" />
+        {/* N/S/E/W pointers */}
+        <path d="M0 -15 L5 -1 L-5 -1 Z" fill="white" />
+        <path d="M0 15 L5 1 L-5 1 Z" fill="url(#accentGradient)" />
+        <path d="M15 0 L1 5 L1 -5 Z" fill="#FDD835" />
+        <path d="M-15 0 L-1 5 L-1 -5 Z" fill="#FDD835" />
+        {/* inner circle */}
+        <circle r="3" fill="white" />
+      </g>
+      
+       {/* Text background */}
+      <path d="M10 68 L90 68 L85 83 L15 83 Z" fill="#1e293b" />
+      <text x="50" y="79" fontFamily="Lato, sans-serif" fontSize="8" fontWeight="bold" fill="white" textAnchor="middle" letterSpacing="0.5">TOURFORGE</text>
+      
+      {/* Lower orange shape */}
+      <path d="M15 83 L85 83 L50 98 Z" fill="url(#accentGradient)" />
+    </g>
+  </svg>
 );

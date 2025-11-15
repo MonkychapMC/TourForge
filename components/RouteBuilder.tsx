@@ -4,6 +4,7 @@ import { findPointsOfInterest, calculateRouteDetails } from '../services/geminiS
 import { PlusIcon, TrashIcon, LoadingSpinner } from './icons';
 import { useI18n } from '../hooks/useI18n';
 import { generateShortId } from '../utils/shortId';
+import Tooltip from './Tooltip';
 
 interface RouteBuilderProps {
   existingRoute?: TourRoute;
@@ -178,7 +179,9 @@ const RouteBuilder: React.FC<RouteBuilderProps> = ({ existingRoute, onSave, onCa
             <h3 className="text-xl font-semibold text-[var(--color-text-primary)] font-serif"> {t('routeDetails')}</h3>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="md:col-span-2">
-                    <label className={labelStyles}>{t('routeName')}</label>
+                    <Tooltip text={t('tooltipRouteName')}>
+                      <label className={labelStyles}>{t('routeName')}</label>
+                    </Tooltip>
                     <input type="text" name="name" value={route.name} onChange={handleChange} className={inputStyles} required />
                      {errors.name && <p className="mt-1 text-sm text-red-500">{t(errors.name)}</p>}
                 </div>
@@ -187,7 +190,9 @@ const RouteBuilder: React.FC<RouteBuilderProps> = ({ existingRoute, onSave, onCa
                     <textarea name="description" value={route.description} onChange={handleChange} rows={2} className={inputStyles}></textarea>
                 </div>
                 <div>
-                  <label className={labelStyles}>{t('personCount')}</label>
+                  <Tooltip text={t('tooltipRoutePersonCount')}>
+                    <label className={labelStyles}>{t('personCount')}</label>
+                  </Tooltip>
                   <div className="relative">
                     <input type="number" name="personCount" value={route.personCount} onChange={handleChange} min="1" className={inputStyles} />
                     {isCalculating && (
@@ -198,51 +203,71 @@ const RouteBuilder: React.FC<RouteBuilderProps> = ({ existingRoute, onSave, onCa
                   </div>
                 </div>
                 <div>
-                    <label className={labelStyles}>{t('kilometers')}</label>
+                    <Tooltip text={t('tooltipKilometers')}>
+                      <label className={labelStyles}>{t('kilometers')}</label>
+                    </Tooltip>
                     <input type="number" name="kilometers" value={route.kilometers} onChange={handleChange} min="0" className={inputStyles} />
                 </div>
                 <div>
-                     <label className={labelStyles}>{t('durationHours')}</label>
+                    <Tooltip text={t('tooltipDuration')}>
+                      <label className={labelStyles}>{t('durationHours')}</label>
+                    </Tooltip>
                     <input type="number" name="durationHours" value={route.durationHours} onChange={handleChange} min="0" className={inputStyles} />
                 </div>
             </div>
         </div>
         
         <div className={cardStyles + " space-y-4"}>
-          <h3 className="text-xl font-semibold text-[var(--color-text-primary)] font-serif">{t('resources')}</h3>
+          <Tooltip text={t('tooltipResources')}>
+            <h3 className="text-xl font-semibold text-[var(--color-text-primary)] font-serif">{t('resources')}</h3>
+          </Tooltip>
           <p className="text-sm text-[var(--color-text-secondary)] -mt-2">{t('resourcesDescription')}</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             <div>
-                <label className={labelStyles}>{t('guideQuantity')}</label>
+                <Tooltip text={t('tooltipGuideQty')}>
+                  <label className={labelStyles}>{t('guideQuantity')}</label>
+                </Tooltip>
                 <input type="number" name="guide" value={route.quantities.guide} onChange={handleChange} min="0" className={inputStyles} />
             </div>
             <div>
-                <label className={labelStyles}>{t('medicalQuantity')}</label>
+                <Tooltip text={t('tooltipMedicalQty')}>
+                  <label className={labelStyles}>{t('medicalQuantity')}</label>
+                </Tooltip>
                 <input type="number" name="medical" value={route.quantities.medical} onChange={handleChange} min="0" className={inputStyles} />
             </div>
             <div>
-                <label className={labelStyles}>{t('transportQuantity')}</label>
+                <Tooltip text={t('tooltipTransportQty')}>
+                  <label className={labelStyles}>{t('transportQuantity')}</label>
+                </Tooltip>
                 <input type="number" name="transport" value={route.quantities.transport} onChange={handleChange} min="0" className={inputStyles} />
             </div>
             <div>
-                <label className={labelStyles}>{t('logisticsQuantity')}</label>
+                <Tooltip text={t('tooltipLogisticsQty')}>
+                  <label className={labelStyles}>{t('logisticsQuantity')}</label>
+                </Tooltip>
                 <input type="number" name="logistics" value={route.quantities.logistics} onChange={handleChange} min="0" className={inputStyles} />
             </div>
             <div>
-                <label className={labelStyles}>{t('photographerCost')}</label>
+                <Tooltip text={t('tooltipPhotographerCost')}>
+                  <label className={labelStyles}>{t('photographerCost')}</label>
+                </Tooltip>
                 <input type="number" name="photographerCost" value={route.photographerCost} onChange={handleChange} min="0" className={inputStyles} />
             </div>
           </div>
            <div className="pt-2 flex items-center">
             <input type="checkbox" id="isPhotographerOptional" name="isPhotographerOptional" checked={route.isPhotographerOptional} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-[var(--color-border)] text-[var(--color-primary)] focus:ring-[var(--color-primary)]" />
-            <label htmlFor="isPhotographerOptional" className="ml-2 block text-sm text-[var(--color-text-primary)]">{t('photographerOptional')}</label>
+            <Tooltip text={t('tooltipPhotographerOptional')}>
+              <label htmlFor="isPhotographerOptional" className="ml-2 block text-sm text-[var(--color-text-primary)]">{t('photographerOptional')}</label>
+            </Tooltip>
           </div>
         </div>
 
         <div className={cardStyles + " space-y-4"}>
           <h3 className="text-xl font-semibold text-[var(--color-text-primary)] font-serif">{t('aiStopSuggestions')}</h3>
           <div className="flex gap-2">
-            <input type="text" value={poiQuery} onChange={(e) => setPoiQuery(e.target.value)} placeholder={t('poiPlaceholder')} className={inputStyles + " flex-grow"} />
+            <Tooltip text={t('tooltipFindStops')} className="w-full flex-grow">
+              <input type="text" value={poiQuery} onChange={(e) => setPoiQuery(e.target.value)} placeholder={t('poiPlaceholder')} className={inputStyles + " flex-grow"} />
+            </Tooltip>
             <button type="button" onClick={handleFindPois} disabled={isFindingPois} className="flex items-center justify-center bg-[var(--color-accent)] text-white px-4 py-2 rounded-md hover:bg-[var(--color-accent-hover)] disabled:opacity-70 transition-colors">
               {isFindingPois ? <LoadingSpinner /> : t('findStops')}
             </button>
@@ -251,7 +276,9 @@ const RouteBuilder: React.FC<RouteBuilderProps> = ({ existingRoute, onSave, onCa
         </div>
 
         <div className={cardStyles + " space-y-4"}>
-            <h3 className="text-xl font-semibold text-[var(--color-text-primary)] font-serif">{t('stopsOnRoute')}</h3>
+            <Tooltip text={t('tooltipStopsOnRoute')}>
+              <h3 className="text-xl font-semibold text-[var(--color-text-primary)] font-serif">{t('stopsOnRoute')}</h3>
+            </Tooltip>
             <div className="space-y-4 pt-2">
                 {route.stops.map((stop, index) => (
                 <div key={stop.id} className="flex items-start gap-4 p-4 border border-[var(--color-border)] rounded-lg bg-black/5 dark:bg-white/5">
