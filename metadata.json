@@ -1,0 +1,5 @@
+{
+  "name": "Background of TourForge",
+  "description": "An intelligent application for forging and managing tourist packages and routes. Utilize AI to generate descriptions, suggest stops, and calculate costs with customizable profit margins and currency conversions.",
+  "requestFramePermissions": []
+}
