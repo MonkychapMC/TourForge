@@ -66,6 +66,7 @@ const App: React.FC = () => {
   const renderContent = () => {
     switch (view.type) {
       case 'DASHBOARD':
+        return <Dashboard tourData={tourData} setView={setView} isHomePage={true} />;
       case 'PACKAGES_LIST':
       case 'ROUTES_LIST':
         return <Dashboard tourData={tourData} setView={setView} initialTab={view.type === 'ROUTES_LIST' ? 'routes' : 'packages'} />;

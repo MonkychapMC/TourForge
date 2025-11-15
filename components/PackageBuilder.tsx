@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TourPackage, TourRoute, UserSettings } from '../types';
-import { generateDescription, generatePromotionalImage, suggestTitle, editImageWithPrompt } from '../services/geminiService';
+import { generateDescription, generatePromotionalImage, editImageWithPrompt } from '../services/geminiService';
 import { LoadingSpinner } from './icons';
 import { useI18n } from '../hooks/useI18n';
 import { generateShortId } from '../utils/shortId';
@@ -23,7 +23,7 @@ const PackageBuilder: React.FC<PackageBuilderProps> = ({ existingPackage, allRou
     costs: { transport: 0, lodging: 0, services: 0 },
     routeIds: [],
   });
-  const [isGenerating, setIsGenerating] = useState({ title: false, description: false, image: false, imageEdit: false });
+  const [isGenerating, setIsGenerating] = useState({ description: false, image: false, imageEdit: false });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageEditPrompt, setImageEditPrompt] = useState<string>('');
 
@@ -58,14 +58,6 @@ const PackageBuilder: React.FC<PackageBuilderProps> = ({ existingPackage, allRou
     const finalPackage: TourPackage = { ...pkg, id: existingPackage?.id || generateShortId() };
     onSave(finalPackage);
     onCancel();
-  };
-
-  const handleSuggestTitle = async () => {
-    if (!pkg.description) return;
-    setIsGenerating(p => ({ ...p, title: true }));
-    const title = await suggestTitle(pkg.description, language);
-    setPkg(p => ({ ...p, name: title }));
-    setIsGenerating(p => ({ ...p, title: false }));
   };
 
   const handleGenerateDescription = async () => {
@@ -123,12 +115,7 @@ const PackageBuilder: React.FC<PackageBuilderProps> = ({ existingPackage, allRou
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label className={labelStyles}>{t('packageName')}</label>
-                    <div className="flex gap-2">
-                        <input type="text" name="name" value={pkg.name} onChange={handleChange} className={inputStyles} required />
-                        <button type="button" onClick={handleSuggestTitle} disabled={isGenerating.title || !pkg.description} className={aiButtonStyles} aria-label={t('suggestTitle')}>
-                            {isGenerating.title ? <LoadingSpinner /> : 'AI'}
-                        </button>
-                    </div>
+                    <input type="text" name="name" value={pkg.name} onChange={handleChange} className={inputStyles} required />
                 </div>
                 <div>
                     <label className={labelStyles}>{t('personCount')}</label>

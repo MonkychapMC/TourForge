@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { TourPackage, TourRoute, UserSettings } from '../types';
 import { View } from '../App';
 import { formatCurrency } from '../utils/currency';
-import { PlusIcon, EditIcon, TrashIcon, PackageIcon, RouteIcon, ShareIcon } from './icons';
+import { PlusIcon, EditIcon, TrashIcon, ShareIcon, CompassIcon } from './icons';
 import { useI18n } from '../hooks/useI18n';
 
 interface DashboardProps {
@@ -17,9 +17,10 @@ interface DashboardProps {
   };
   setView: (view: View) => void;
   initialTab?: 'packages' | 'routes';
+  isHomePage?: boolean;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ tourData, setView, initialTab = 'packages' }) => {
+const Dashboard: React.FC<DashboardProps> = ({ tourData, setView, initialTab = 'packages', isHomePage = false }) => {
   const { packages, routes, settings, deletePackage, deleteRoute } = tourData;
   const { t } = useI18n();
   const [activeTab, setActiveTab] = useState(initialTab);
@@ -73,27 +74,45 @@ const Dashboard: React.FC<DashboardProps> = ({ tourData, setView, initialTab = '
       alert(t('shareFallback'));
     }
   };
+  
+  if (isHomePage && packages.length === 0 && routes.length === 0) {
+    return (
+      <div className="flex items-center justify-center" style={{minHeight: 'calc(100vh - 200px)'}}>
+        <div className="text-center p-8 sm:p-12 bg-[var(--color-card)] rounded-lg shadow-xl border border-[var(--color-border)] max-w-2xl mx-auto">
+          <CompassIcon className="w-16 h-16 text-[var(--color-primary)] mx-auto mb-4 animate-pulse" />
+          <h2 className="text-3xl font-bold font-serif text-[var(--color-text-primary)] mb-4">{t('welcomeTitle')}</h2>
+          <p className="text-[var(--color-text-secondary)] mb-8 leading-relaxed">{t('welcomeMessage')}</p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <button onClick={() => setView({ type: 'CREATE_ROUTE' })} className="bg-[var(--color-primary)] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[var(--color-primary-hover)] flex items-center justify-center gap-2 transition-transform transform hover:scale-105">
+              <PlusIcon /> {t('startWithRoute')}
+            </button>
+            <button onClick={() => setView({ type: 'CREATE_PACKAGE' })} className="bg-[var(--color-accent)] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[var(--color-accent-hover)] flex items-center justify-center gap-2 transition-transform transform hover:scale-105">
+              <PlusIcon /> {t('startWithPackage')}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  const tabClass = (tabName: string) => 
-    `px-4 py-2 font-semibold rounded-md text-sm transition-colors ${activeTab === tabName ? 'bg-[var(--color-primary)] text-white' : 'text-[var(--color-text-secondary)] hover:bg-black/10 dark:hover:bg-white/10'}`;
+  const EmptyStateWithCTA: React.FC<{ message: string; buttonText: string; onClick: () => void; }> = ({ message, buttonText, onClick }) => (
+    <div className="col-span-full text-center py-16 px-4 bg-[var(--color-card)] rounded-lg border-2 border-dashed border-[var(--color-border)]">
+        <p className="text-[var(--color-text-secondary)] mb-6">{message}</p>
+        <button onClick={onClick} className="bg-[var(--color-primary)] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[var(--color-primary-hover)] flex items-center justify-center gap-2 transition-transform transform hover:scale-105 mx-auto">
+            <PlusIcon /> {buttonText}
+        </button>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
-       <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2 p-1 rounded-lg bg-black/5 dark:bg-white/5">
-          <button onClick={() => setActiveTab('packages')} className={tabClass('packages')}>
-            {t('tourPackages')}
-          </button>
-          <button onClick={() => setActiveTab('routes')} className={tabClass('routes')}>
-            {t('tourRoutes')}
-          </button>
-        </div>
-         {activeTab === 'packages' && (
+       <div className="flex justify-end items-center">
+         {activeTab === 'packages' && packages.length > 0 && (
              <button onClick={() => setView({ type: 'CREATE_PACKAGE' })} className="bg-[var(--color-primary)] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[var(--color-primary-hover)] flex items-center gap-2 transition-colors duration-200">
                 <PlusIcon /> {t('newPackage')}
             </button>
          )}
-         {activeTab === 'routes' && (
+         {activeTab === 'routes' && routes.length > 0 && (
             <button onClick={() => setView({ type: 'CREATE_ROUTE' })} className="bg-[var(--color-primary)] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[var(--color-primary-hover)] flex items-center gap-2 transition-colors duration-200">
                 <PlusIcon /> {t('newRoute')}
             </button>
@@ -103,7 +122,11 @@ const Dashboard: React.FC<DashboardProps> = ({ tourData, setView, initialTab = '
       {activeTab === 'packages' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {packages.length === 0 ? (
-            <p className="text-[var(--color-text-secondary)] col-span-full">{t('noPackages')}</p>
+            <EmptyStateWithCTA 
+              message={t('noPackages')} 
+              buttonText={t('newPackage')}
+              onClick={() => setView({ type: 'CREATE_PACKAGE' })} 
+            />
           ) : (
             packages.map(pkg => {
               const totalPrice = calculatePackagePrice(pkg);
@@ -135,7 +158,11 @@ const Dashboard: React.FC<DashboardProps> = ({ tourData, setView, initialTab = '
       {activeTab === 'routes' && (
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {routes.length === 0 ? (
-                <p className="text-[var(--color-text-secondary)] col-span-full">{t('noRoutes')}</p>
+                <EmptyStateWithCTA
+                  message={t('noRoutes')}
+                  buttonText={t('newRoute')}
+                  onClick={() => setView({ type: 'CREATE_ROUTE' })}
+                />
             ) : (
                 routes.map(route => {
                     const totalCost = calculateRouteCost(route);

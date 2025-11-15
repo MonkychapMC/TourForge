@@ -156,20 +156,20 @@ export interface RouteCalculationResult {
     }
 }
 
-export const calculateRouteDetails = async (stopNames: string[]): Promise<RouteCalculationResult | null> => {
-    if (stopNames.length < 2) return null;
+export const calculateRouteDetails = async (stopNames: string[], personCount: number): Promise<RouteCalculationResult | null> => {
+    if (stopNames.length < 2 || personCount <= 0) return null;
 
     const stopsList = stopNames.join(', ');
 
     try {
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
-            contents: `For a one-day tourist route visiting these stops in order: ${stopsList}, provide realistic estimates for the following. The route starts at the first stop and ends at the last.
+            contents: `For a one-day tourist route for ${personCount} people visiting these stops in order: ${stopsList}, provide realistic estimates for the following. The route starts at the first stop and ends at the last.
             - Total travel distance in kilometers.
             - Total duration in hours, including travel and visiting time.
-            - Estimated quantity of professional guides needed.
+            - Estimated quantity of professional guides needed for the group.
             - Estimated quantity of medical kits/support units needed per person.
-            - Estimated quantity of private vehicles (e.g., a van) needed.
+            - Estimated quantity of private vehicles (e.g., a van) needed for the group.
             - Estimated quantity of logistics units (e.g., water/snack packs) needed per person.
             Return ONLY a JSON object.`,
             config: {

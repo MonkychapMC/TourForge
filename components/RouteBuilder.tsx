@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { TourRoute, TourStop, UserSettings } from '../types';
 import { findPointsOfInterest, calculateRouteDetails } from '../services/geminiService';
 import { PlusIcon, TrashIcon, LoadingSpinner } from './icons';
@@ -41,14 +41,51 @@ const RouteBuilder: React.FC<RouteBuilderProps> = ({ existingRoute, onSave, onCa
     }
   }, [existingRoute]);
 
+  const stopNamesJson = useMemo(() => JSON.stringify(route.stops.map(s => s.name).filter(Boolean)), [route.stops]);
+
+  const handleAutoCalculation = useCallback(async () => {
+    const stopNames = JSON.parse(stopNamesJson);
+
+    if (stopNames.length < 2 || route.personCount <= 0) {
+      return;
+    }
+
+    setIsCalculating(true);
+    try {
+      const result = await calculateRouteDetails(stopNames, route.personCount);
+
+      if (result) {
+        setRoute(prev => ({
+          ...prev,
+          kilometers: result.kilometers,
+          durationHours: result.durationHours,
+          quantities: result.quantities,
+        }));
+      }
+    } catch (error) {
+        console.error("Error auto-calculating route details:", error);
+    } finally {
+      setIsCalculating(false);
+    }
+  }, [route.personCount, stopNamesJson]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      handleAutoCalculation();
+    }, 1000); // Debounce for 1 second
+
+    return () => clearTimeout(timer);
+  }, [handleAutoCalculation]);
+
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     if (name in route.quantities) {
       setRoute(prev => ({ ...prev, quantities: { ...prev.quantities, [name]: parseInt(value, 10) || 0 } }));
-    } else if (name === 'personCount' || name === 'kilometers' || name === 'durationHours') {
+    } else if (name === 'personCount') {
        setRoute(prev => ({ ...prev, [name]: parseInt(value, 10) || 1 }));
-    } else if (name === 'photographerCost') {
-      setRoute(prev => ({...prev, photographerCost: parseFloat(value) || 0}));
+    } else if (name === 'kilometers' || name === 'durationHours' || name === 'photographerCost') {
+      setRoute(prev => ({...prev, [name]: parseFloat(value) || 0}));
     } else {
       setRoute(prev => ({ ...prev, [name]: value }));
     }
@@ -80,26 +117,6 @@ const RouteBuilder: React.FC<RouteBuilderProps> = ({ existingRoute, onSave, onCa
     setPoiSuggestions(suggestions);
     setIsFindingPois(false);
   };
-  
-  const handleCalculateDetails = async () => {
-    if (route.stops.length < 2) {
-      return;
-    }
-    setIsCalculating(true);
-    const stopNames = route.stops.map(s => s.name).filter(Boolean);
-    const result = await calculateRouteDetails(stopNames);
-
-    if (result) {
-      setRoute(prev => ({
-        ...prev,
-        kilometers: result.kilometers,
-        durationHours: result.durationHours,
-        quantities: result.quantities
-      }));
-    }
-    setIsCalculating(false);
-  };
-
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,7 +146,14 @@ const RouteBuilder: React.FC<RouteBuilderProps> = ({ existingRoute, onSave, onCa
                 </div>
                 <div>
                   <label className={labelStyles}>{t('personCount')}</label>
-                  <input type="number" name="personCount" value={route.personCount} onChange={handleChange} min="1" className={inputStyles} />
+                  <div className="relative">
+                    <input type="number" name="personCount" value={route.personCount} onChange={handleChange} min="1" className={inputStyles} />
+                    {isCalculating && (
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <LoadingSpinner className="h-5 w-5 text-[var(--color-primary)]" />
+                        </div>
+                    )}
+                  </div>
                 </div>
                 <div>
                     <label className={labelStyles}>{t('kilometers')}</label>
@@ -185,27 +209,22 @@ const RouteBuilder: React.FC<RouteBuilderProps> = ({ existingRoute, onSave, onCa
         </div>
 
         <div className={cardStyles + " space-y-4"}>
-             <div className="flex justify-between items-center">
-                <h3 className="text-xl font-semibold text-[var(--color-text-primary)] font-serif">{t('stopsOnRoute')}</h3>
-                 <button type="button" onClick={handleCalculateDetails} disabled={isCalculating || route.stops.length < 2} className="flex items-center justify-center gap-2 bg-[var(--color-accent)] text-white px-4 py-2 rounded-md hover:bg-[var(--color-accent-hover)] disabled:opacity-70 transition-colors">
-                    {isCalculating ? <LoadingSpinner /> : '✨'} {t('calculateDetails')}
-                </button>
-            </div>
-          <div className="space-y-4">
-            {route.stops.map((stop, index) => (
-              <div key={stop.id} className="flex items-start gap-4 p-4 border border-[var(--color-border)] rounded-lg bg-black/5 dark:bg-white/5">
-                <span className="pt-2 text-lg font-bold text-[var(--color-text-secondary)]">{index + 1}.</span>
-                <div className="flex-grow space-y-2">
-                    <input type="text" placeholder={t('stopName')} value={stop.name} onChange={(e) => handleStopChange(index, 'name', e.target.value)} className={inputStyles} />
-                    <textarea placeholder={t('description')} value={stop.description} onChange={(e) => handleStopChange(index, 'description', e.target.value)} rows={2} className={inputStyles} />
+            <h3 className="text-xl font-semibold text-[var(--color-text-primary)] font-serif">{t('stopsOnRoute')}</h3>
+            <div className="space-y-4 pt-2">
+                {route.stops.map((stop, index) => (
+                <div key={stop.id} className="flex items-start gap-4 p-4 border border-[var(--color-border)] rounded-lg bg-black/5 dark:bg-white/5">
+                    <span className="pt-2 text-lg font-bold text-[var(--color-text-secondary)]">{index + 1}.</span>
+                    <div className="flex-grow space-y-2">
+                        <input type="text" placeholder={t('stopName')} value={stop.name} onChange={(e) => handleStopChange(index, 'name', e.target.value)} className={inputStyles} />
+                        <textarea placeholder={t('description')} value={stop.description} onChange={(e) => handleStopChange(index, 'description', e.target.value)} rows={2} className={inputStyles} />
+                    </div>
+                    <button type="button" onClick={() => removeStop(index)} className="p-2 text-slate-400 hover:text-red-500 transition-colors" aria-label={t('removeStop')}><TrashIcon /></button>
                 </div>
-                <button type="button" onClick={() => removeStop(index)} className="p-2 text-slate-400 hover:text-red-500 transition-colors" aria-label={t('removeStop')}><TrashIcon /></button>
-              </div>
-            ))}
-          </div>
-          <button type="button" onClick={addStop} className="mt-2 flex items-center gap-2 text-[var(--color-primary)] font-semibold hover:text-[var(--color-primary-hover)] transition-colors">
-            <PlusIcon /> {t('addStop')}
-          </button>
+                ))}
+            </div>
+            <button type="button" onClick={addStop} className="mt-2 flex items-center gap-2 text-[var(--color-primary)] font-semibold hover:text-[var(--color-primary-hover)] transition-colors">
+                <PlusIcon /> {t('addStop')}
+            </button>
         </div>
 
         <div className="flex justify-end gap-4 pt-4">
