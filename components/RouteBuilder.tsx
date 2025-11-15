@@ -34,6 +34,8 @@ const RouteBuilder: React.FC<RouteBuilderProps> = ({ existingRoute, onSave, onCa
   const [isFindingPois, setIsFindingPois] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
   const [poiSuggestions, setPoiSuggestions] = useState('');
+  const [errors, setErrors] = useState<{ name?: string; stops?: { [index: number]: string } }>({});
+
 
   useEffect(() => {
     if (existingRoute) {
@@ -80,12 +82,15 @@ const RouteBuilder: React.FC<RouteBuilderProps> = ({ existingRoute, onSave, onCa
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+     if (name === 'name' && value.trim()) {
+        setErrors(prev => ({ ...prev, name: undefined }));
+    }
     if (name in route.quantities) {
-      setRoute(prev => ({ ...prev, quantities: { ...prev.quantities, [name]: parseInt(value, 10) || 0 } }));
+      setRoute(prev => ({ ...prev, quantities: { ...prev.quantities, [name]: Math.max(0, parseInt(value, 10) || 0) } }));
     } else if (name === 'personCount') {
-       setRoute(prev => ({ ...prev, [name]: parseInt(value, 10) || 1 }));
+       setRoute(prev => ({ ...prev, [name]: Math.max(1, parseInt(value, 10) || 1) }));
     } else if (name === 'kilometers' || name === 'durationHours' || name === 'photographerCost') {
-      setRoute(prev => ({...prev, [name]: parseFloat(value) || 0}));
+      setRoute(prev => ({...prev, [name]: Math.max(0, parseFloat(value) || 0)}));
     } else {
       setRoute(prev => ({ ...prev, [name]: value }));
     }
@@ -99,6 +104,14 @@ const RouteBuilder: React.FC<RouteBuilderProps> = ({ existingRoute, onSave, onCa
     const newStops = [...route.stops];
     newStops[index] = { ...newStops[index], [field]: value };
     setRoute(prev => ({...prev, stops: newStops}));
+
+     if (field === 'name' && value.trim() && errors.stops?.[index]) {
+        setErrors(prev => {
+            const newStopErrors = {...(prev.stops || {})};
+            delete newStopErrors[index];
+            return {...prev, stops: newStopErrors};
+        });
+    }
   };
 
   const addStop = () => {
@@ -118,8 +131,36 @@ const RouteBuilder: React.FC<RouteBuilderProps> = ({ existingRoute, onSave, onCa
     setIsFindingPois(false);
   };
 
+  const validate = (): boolean => {
+    const newErrors: { name?: string; stops?: { [index: number]: string } } = {};
+    let isValid = true;
+
+    if (!route.name.trim()) {
+        newErrors.name = 'routeNameRequired';
+        isValid = false;
+    }
+
+    const stopErrors: { [index: number]: string } = {};
+    route.stops.forEach((stop, index) => {
+        if (!stop.name.trim()) {
+        stopErrors[index] = 'stopNameRequired';
+        isValid = false;
+        }
+    });
+
+    if (Object.keys(stopErrors).length > 0) {
+        newErrors.stops = stopErrors;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validate()) {
+        return;
+    }
     const finalRoute: TourRoute = { ...route, id: existingRoute?.id || generateShortId() };
     onSave(finalRoute);
     onCancel();
@@ -139,6 +180,7 @@ const RouteBuilder: React.FC<RouteBuilderProps> = ({ existingRoute, onSave, onCa
                 <div className="md:col-span-2">
                     <label className={labelStyles}>{t('routeName')}</label>
                     <input type="text" name="name" value={route.name} onChange={handleChange} className={inputStyles} required />
+                     {errors.name && <p className="mt-1 text-sm text-red-500">{t(errors.name)}</p>}
                 </div>
                 <div className="md:col-span-2">
                     <label className={labelStyles}>{t('description')}</label>
@@ -216,6 +258,7 @@ const RouteBuilder: React.FC<RouteBuilderProps> = ({ existingRoute, onSave, onCa
                     <span className="pt-2 text-lg font-bold text-[var(--color-text-secondary)]">{index + 1}.</span>
                     <div className="flex-grow space-y-2">
                         <input type="text" placeholder={t('stopName')} value={stop.name} onChange={(e) => handleStopChange(index, 'name', e.target.value)} className={inputStyles} />
+                         {errors.stops?.[index] && <p className="mt-1 text-sm text-red-500">{t(errors.stops[index])}</p>}
                         <textarea placeholder={t('description')} value={stop.description} onChange={(e) => handleStopChange(index, 'description', e.target.value)} rows={2} className={inputStyles} />
                     </div>
                     <button type="button" onClick={() => removeStop(index)} className="p-2 text-slate-400 hover:text-red-500 transition-colors" aria-label={t('removeStop')}><TrashIcon /></button>

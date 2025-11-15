@@ -1,5 +1,6 @@
 
 
+
 import React, { useState } from 'react';
 import { TourPackage, TourRoute, UserSettings } from '../types';
 import { View } from '../App';
@@ -31,17 +32,25 @@ const Dashboard: React.FC<DashboardProps> = ({ tourData, setView, initialTab = '
 
     if (!unitCosts) return 0;
 
-    const groupCosts = 
-      (quantities.guide * unitCosts.guide) +
-      (quantities.transport * unitCosts.transport);
-      
-    const photographerTotalCost = isPhotographerOptional ? 0 : photographerCost;
+    // Define which costs are per person vs. per group
+    const perPersonCostKeys: (keyof typeof quantities)[] = ['medical', 'logistics'];
+    const groupCostKeys: (keyof typeof quantities)[] = ['guide', 'transport'];
 
-    const perPersonCosts = 
-      (quantities.medical * unitCosts.medical) +
-      (quantities.logistics * unitCosts.logistics);
+    // Calculate the total cost of all per-person items for one person
+    const totalPerPersonCost = perPersonCostKeys.reduce((total, key) => {
+        // Use || 0 as a safeguard in case a unit cost is not defined
+        return total + (quantities[key] * (unitCosts[key] || 0));
+    }, 0);
+
+    // Calculate the total cost of all group-wide items
+    const totalGroupCost = groupCostKeys.reduce((total, key) => {
+        return total + (quantities[key] * (unitCosts[key] || 0));
+    }, 0);
     
-    const totalCost = groupCosts + photographerTotalCost + (perPersonCosts * personCount);
+    const photographerTotalCost = isPhotographerOptional ? 0 : photographerCost;
+    
+    // Final cost is group costs + photographer + (total per-person cost * number of people)
+    const totalCost = totalGroupCost + photographerTotalCost + (totalPerPersonCost * personCount);
 
     return totalCost;
   };
@@ -104,9 +113,25 @@ const Dashboard: React.FC<DashboardProps> = ({ tourData, setView, initialTab = '
     </div>
   );
 
+  const tabButtonStyles = (tabName: 'packages' | 'routes') =>
+    `px-4 py-2 text-sm font-semibold rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 ${
+      activeTab === tabName
+        ? 'bg-[var(--color-primary)] text-white shadow-md'
+        : 'text-[var(--color-text-secondary)] hover:bg-black/5 dark:hover:bg-white/5'
+    }`;
+
   return (
     <div className="space-y-6">
-       <div className="flex justify-end items-center">
+      <div className="flex items-center justify-between">
+        <div className="flex space-x-2 bg-black/5 dark:bg-white/5 p-1 rounded-lg">
+          <button onClick={() => setActiveTab('packages')} className={tabButtonStyles('packages')}>
+            {t('packages')}
+          </button>
+          <button onClick={() => setActiveTab('routes')} className={tabButtonStyles('routes')}>
+            {t('routes')}
+          </button>
+        </div>
+        
          {activeTab === 'packages' && packages.length > 0 && (
              <button onClick={() => setView({ type: 'CREATE_PACKAGE' })} className="bg-[var(--color-primary)] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[var(--color-primary-hover)] flex items-center gap-2 transition-colors duration-200">
                 <PlusIcon /> {t('newPackage')}

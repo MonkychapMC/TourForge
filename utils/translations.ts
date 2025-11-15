@@ -96,6 +96,8 @@ export const translations: Record<Language, Translations> = {
     welcomeMessage: 'Ready to craft unforgettable experiences? Start by creating a detailed tour route with multiple stops. Once you have your routes, bundle them into attractive tour packages for your clients. Use the AI Assistant anytime for inspiration or help!',
     startWithRoute: 'Create Your First Route',
     startWithPackage: 'Create a Package',
+    routeNameRequired: 'Route name is required.',
+    stopNameRequired: 'Stop name is required.',
   },
   es: {
     dashboard: 'Inicio',
@@ -186,6 +188,8 @@ export const translations: Record<Language, Translations> = {
     welcomeMessage: '¿Listo para crear experiencias inolvidables? Comienza creando una ruta turística detallada con múltiples paradas. Una vez que tengas tus rutas, agrúpalas en atractivos paquetes turísticos para tus clientes. ¡Usa el Asistente de IA en cualquier momento para obtener inspiración o ayuda!',
     startWithRoute: 'Crea tu Primera Ruta',
     startWithPackage: 'Crear un Paquete',
+    routeNameRequired: 'El nombre de la ruta es obligatorio.',
+    stopNameRequired: 'El nombre de la parada es obligatorio.',
   },
   fr: {
     dashboard: 'Accueil',
@@ -276,6 +280,8 @@ export const translations: Record<Language, Translations> = {
     welcomeMessage: "Prêt à créer des expériences inoubliables ? Commencez par créer un itinéraire touristique détaillé avec plusieurs arrêts. Une fois que vous avez vos itinéraires, regroupez-les dans des forfaits touristiques attrayants pour vos clients. Utilisez l'Assistant IA à tout moment pour trouver de l'inspiration ou de l'aide !",
     startWithRoute: 'Créez Votre Premier Itinéraire',
     startWithPackage: 'Créer un Forfait',
+    routeNameRequired: "Le nom de l'itinéraire est requis.",
+    stopNameRequired: "Le nom de l'arrêt est requis.",
   },
   pt: {
     dashboard: 'Início',
@@ -366,5 +372,7 @@ export const translations: Record<Language, Translations> = {
     welcomeMessage: 'Pronto para criar experiências inesquecíveis? Comece criando uma rota turística detalhada com várias paradas. Depois de ter suas rotas, agrupe-as em pacotes turísticos atraentes para seus clientes. Use o Assistente de IA a qualquer momento para obter inspiração ou ajuda!',
     startWithRoute: 'Crie Sua Primeira Rota',
     startWithPackage: 'Criar um Pacote',
+    routeNameRequired: 'O nome da rota é obrigatório.',
+    stopNameRequired: 'O nome da parada é obrigatório.',
   },
 };

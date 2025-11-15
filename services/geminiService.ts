@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Modality, Chat, GenerateContentResponse, Type } from "@google/genai";
 
 const API_KEY = process.env.API_KEY;
@@ -45,7 +46,6 @@ export const generateDescription = async (prompt: string, language: string): Pro
             contents: `Generate a compelling, one-paragraph tour description in ${langName} based on these keywords: "${prompt}"`,
         });
         return response.text;
-    // FIX: Added curly braces to the catch block for correct syntax.
     } catch (error) {
         console.error("Error generating description:", error);
         return "Failed to generate description from AI.";
