@@ -2,6 +2,20 @@
   "short_name": "TourForge",
   "name": "TourForge - AI Tour Planner",
   "description": "An intelligent application for forging and managing tourist packages and routes. Utilize AI to generate descriptions, suggest stops, and calculate costs with customizable profit margins and currency conversions.",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    }
+  ],
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#334155",

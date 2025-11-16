@@ -29,12 +29,14 @@ const getInitialState = (): TourData => {
     const item = window.localStorage.getItem(LOCAL_STORAGE_KEY);
     if (item) {
       const parsed = JSON.parse(item);
-      // Ensure settings are merged with defaults to avoid missing keys on updates
+      // FIX: Robustly load data from localStorage, providing defaults for missing top-level keys
+      // to prevent crashes when loading data from older versions of the app.
       return {
-          ...parsed,
+          packages: parsed.packages || [],
+          routes: parsed.routes || [],
           settings: {
               ...defaultSettings,
-              ...parsed.settings,
+              ...(parsed.settings || {}),
           }
       };
     }

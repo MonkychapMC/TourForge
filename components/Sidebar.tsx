@@ -2,6 +2,7 @@ import React from 'react';
 import { View } from '../App';
 import { useI18n } from '../hooks/useI18n';
 import { SettingsIcon, DashboardIcon, TourForgeLogo, PackageIcon, RouteIcon, CloseIcon, InstallIcon } from './icons';
+import Tooltip from './Tooltip';
 
 interface SidebarProps {
   view: View;
@@ -9,6 +10,7 @@ interface SidebarProps {
   onSettingsClick: () => void;
   isOpen: boolean;
   onClose: () => void;
+  onInstallClick: () => void;
 }
 
 const NavLink: React.FC<{
@@ -31,7 +33,7 @@ const NavLink: React.FC<{
 );
 
 
-const Sidebar: React.FC<SidebarProps> = ({ view, setView, onSettingsClick, isOpen, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ view, setView, onSettingsClick, isOpen, onClose, onInstallClick }) => {
     const { t, settings } = useI18n();
 
     const isHomeActive = view.type === 'DASHBOARD';
@@ -87,25 +89,31 @@ const Sidebar: React.FC<SidebarProps> = ({ view, setView, onSettingsClick, isOpe
                         onClick={() => { setView({ type: 'ROUTES_LIST' }); onClose(); }} 
                     />
                 </nav>
-                <div className="p-4 border-t border-slate-700 space-y-4">
-                    <div>
-                        <p className="text-xs text-slate-400 mb-2">{t('userId')}:</p>
-                        <p className="text-xs font-mono text-slate-300 break-all">{settings.userId}</p>
+                <div className="p-4 border-t border-slate-700">
+                    <div className="mb-4">
+                      <p className="text-xs text-slate-400 mb-1">{t('userId')}:</p>
+                      <p className="text-xs font-mono text-slate-300 break-all">{settings.userId}</p>
                     </div>
-                    <button
-                        onClick={() => { setView({ type: 'INSTALL_APP' }); onClose(); }}
-                        className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors bg-slate-700 hover:bg-slate-600 text-white"
-                    >
-                        <InstallIcon className="w-5 h-5" />
-                        <span>{t('installApp')}</span>
-                    </button>
-                    <button
-                        onClick={() => { onSettingsClick(); onClose(); }}
-                        className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors bg-slate-700 hover:bg-slate-600 text-white"
-                    >
-                        <SettingsIcon className="w-5 h-5" />
-                        <span>{t('settings')}</span>
-                    </button>
+
+                    <div className="space-y-2">
+                        <Tooltip text={t('tooltipInstallApp')} className="block w-full">
+                            <button
+                                onClick={onInstallClick}
+                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors bg-slate-700 hover:bg-slate-600 text-white"
+                            >
+                                <InstallIcon className="w-5 h-5" />
+                                <span>{t('installApp')}</span>
+                            </button>
+                        </Tooltip>
+                        
+                        <button
+                            onClick={() => { onSettingsClick(); onClose(); }}
+                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors bg-slate-700 hover:bg-slate-600 text-white"
+                        >
+                            <SettingsIcon className="w-5 h-5" />
+                            <span>{t('settings')}</span>
+                        </button>
+                    </div>
                 </div>
             </aside>
         </>

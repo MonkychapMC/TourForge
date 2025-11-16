@@ -1,14 +1,12 @@
 // service-worker.ts
-const CACHE_NAME = 'tourforge-v1.3.0'; // Updated version
+const CACHE_NAME = 'tourforge-v1.5.0'; // Updated version
+// Cache only essential, local files for a reliable install.
 const URLS_TO_CACHE = [
   '/',
   '/index.html',
-  '/index.tsx',
-  'https://cdn.tailwindcss.com',
-  'https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Lora:wght@400;700&display=swap',
-  'https://aistudiocdn.com/react@^19.2.0',
-  'https://aistudiocdn.com/react-dom@^19.2.0/',
-  'https://aistudiocdn.com/@google/genai@^1.29.1',
+  '/manifest.json',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
 ];
 
 // Install a service worker
@@ -16,56 +14,54 @@ self.addEventListener('install', (event: any) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('Opened cache');
-        const requests = URLS_TO_CACHE.map(url => new Request(url, { mode: 'no-cors' }));
-        return cache.addAll(requests).catch(err => {
-          console.error('Failed to cache during install:', err);
-        });
+        console.log('Opened cache and caching essential app shell files.');
+        return cache.addAll(URLS_TO_CACHE);
+      })
+      .catch(err => {
+        console.error('Failed to cache essential files during install:', err);
       })
   );
 });
 
-// Cache and return requests
+// Cache and return requests using a "Cache first, falling back to network" strategy.
 self.addEventListener('fetch', (event: any) => {
-  // We only want to cache GET requests.
+  // We only want to handle GET requests.
   if (event.request.method !== 'GET') {
     return;
   }
-  
+
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Cache hit - return response
-        if (response) {
-          return response;
+    caches.open(CACHE_NAME).then(async (cache) => {
+      // Check the cache for a matching request.
+      const cachedResponse = await cache.match(event.request);
+      if (cachedResponse) {
+        // If we found a match in the cache, return it.
+        return cachedResponse;
+      }
+
+      // If the request is not in the cache, fetch it from the network.
+      try {
+        const networkResponse = await fetch(event.request);
+        
+        // If the fetch is successful, clone the response and store it in the cache.
+        // We only cache valid, successful (200) responses.
+        if (networkResponse && networkResponse.status === 200) {
+          cache.put(event.request, networkResponse.clone());
         }
 
-        const fetchRequest = event.request.clone();
-
-        return fetch(fetchRequest).then(
-          (response) => {
-            // We don't cache failed requests or non-basic responses (e.g. from extensions)
-            // Opaque responses (no-cors) are fine to cache for offline support.
-            if (!response || (response.status !== 200 && response.type !== 'opaque') || (response.type === 'basic' && response.status !== 200)) {
-              return response;
-            }
-
-            const responseToCache = response.clone();
-
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
-
-            return response;
-          }
-        ).catch(err => {
-            console.warn(`Fetch failed for ${event.request.url}; returning offline fallback if available.`);
-            return caches.match(event.request);
-        });
-      })
+        // Return the response from the network.
+        return networkResponse;
+      } catch (error) {
+        // The fetch failed, likely due to a network error.
+        console.error('Network request failed:', error);
+        // Optionally, you could return a custom offline page here.
+        // For now, we'll let the browser's default error handling take over.
+        throw error;
+      }
+    })
   );
 });
+
 
 // Update a service worker
 self.addEventListener('activate', (event: any) => {
@@ -75,6 +71,7 @@ self.addEventListener('activate', (event: any) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
+            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
