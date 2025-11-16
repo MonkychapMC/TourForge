@@ -9,6 +9,7 @@ import SettingsModal from './components/SettingsModal';
 import AiAssistant from './components/AiAssistant';
 import Sidebar from './components/Sidebar';
 import { useI18n } from './hooks/useI18n';
+import InstallPage from './components/InstallPage';
 
 export type View =
   | { type: 'DASHBOARD' }
@@ -17,7 +18,8 @@ export type View =
   | { type: 'CREATE_PACKAGE' }
   | { type: 'EDIT_PACKAGE'; packageId: string }
   | { type: 'CREATE_ROUTE' }
-  | { type: 'EDIT_ROUTE'; routeId: string };
+  | { type: 'EDIT_ROUTE'; routeId: string }
+  | { type: 'INSTALL_APP' };
 
 const App: React.FC = () => {
   const tourData = useTour();
@@ -73,6 +75,7 @@ const App: React.FC = () => {
       case 'EDIT_PACKAGE': return t('editPackage');
       case 'CREATE_ROUTE': return t('createRoute');
       case 'EDIT_ROUTE': return t('editRoute');
+      case 'INSTALL_APP': return t('installApp');
       default: return 'TourForge';
     }
   };
@@ -106,6 +109,8 @@ const App: React.FC = () => {
         return <RouteBuilder onSave={addRoute} onCancel={() => setView({ type: 'ROUTES_LIST' })} settings={settings} />;
       case 'EDIT_ROUTE':
         return activeRoute ? <RouteBuilder existingRoute={activeRoute} onSave={updateRoute} onCancel={() => setView({ type: 'ROUTES_LIST' })} settings={settings} /> : <Dashboard tourData={tourData} setView={setView} />;
+      case 'INSTALL_APP':
+        return <InstallPage installPrompt={installPrompt} onInstallClick={handleInstallClick} />;
       default:
         return <Dashboard tourData={tourData} setView={setView} />;
     }
@@ -119,8 +124,6 @@ const App: React.FC = () => {
         onSettingsClick={() => setIsSettingsOpen(true)}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
-        installPrompt={installPrompt}
-        onInstallClick={handleInstallClick}
       />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header title={getTitleForView(view)} onMenuClick={() => setIsSidebarOpen(true)} />
